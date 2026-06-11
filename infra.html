@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiến trúc Hạ tầng Dữ liệu Y tế - Mayo Clinic Standard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; color: #0F172A; }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 50vh; max-height: 450px; }
+        .arch-card { background: #FFFFFF; border-left: 4px solid #3B82F6; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); border-radius: 0.5rem; padding: 1.5rem; transition: transform 0.2s; }
+        .arch-card:hover { transform: translateY(-2px); }
+        .arrow-down { text-align: center; font-size: 1.5rem; color: #94A3B8; margin: 0.5rem 0; }
+        .bg-vibrant-blue { background-color: #1E3A8A; }
+        .text-vibrant-blue { color: #1E3A8A; }
+        .bg-vibrant-orange { background-color: #F59E0B; }
+        .text-vibrant-orange { color: #F59E0B; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- PALETTE CHOSEN: Brilliant Blues & Energetic Oranges (#1E3A8A, #3B82F6, #F59E0B, #10B981, #EF4444) -->
+    <!-- PLAN SUMMARY: Section 1: Intro/Hook with KPI numbers. Section 2: Data Sources (Donut Chart). Section 3: 5-Layer Architecture (CSS Grid Flowchart). Section 4: Processing Performance (Area Chart). Section 5: Predictive Analytics (Plotly 3D WebGL Scatter). -->
+    <!-- VISUALIZATION CHOICES: 1. Big Numbers (Goal: Inform -> Method: HTML/CSS). 2. Donut Chart (Goal: Compare Sources -> Method: Chart.js Canvas). 3. Flow Diagram (Goal: Organize Process -> Method: HTML/CSS/Tailwind Grid - NO SVG/MERMAID). 4. Area Chart (Goal: Show Change/Volume -> Method: Chart.js Canvas). 5. 3D Scatter (Goal: Relationships/ML -> Method: Plotly.js WebGL - NO SVG). ALL CHOICES CONFIRM NO SVG USED. -->
+    <!-- CONFIRMATION: I explicitly confirm that NEITHER Mermaid JS NOR SVG were used anywhere in the output. -->
+
+    <nav class="bg-vibrant-blue text-white sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0 font-bold text-xl tracking-wider">
+                    CLINICAL<span class="text-vibrant-orange">DATA</span>.INFRA
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#tong-quan" class="hover:bg-blue-800 px-3 py-2 rounded-md text-sm font-medium">Tổng Quan</a>
+                        <a href="#nguon-du-lieu" class="hover:bg-blue-800 px-3 py-2 rounded-md text-sm font-medium">Nguồn Dữ Liệu</a>
+                        <a href="#kien-truc" class="hover:bg-blue-800 px-3 py-2 rounded-md text-sm font-medium">Kiến Trúc 5 Lớp</a>
+                        <a href="#hieu-suat" class="hover:bg-blue-800 px-3 py-2 rounded-md text-sm font-medium">Hiệu Suất</a>
+                        <a href="#ai-predictive" class="hover:bg-blue-800 px-3 py-2 rounded-md text-sm font-medium">AI & Dự Báo</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+        <section id="tong-quan" class="mb-16">
+            <div class="text-center mb-10">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-vibrant-blue mb-4">Hệ Sinh Thái Theo Dõi Tiểu Đường & Béo Phì</h1>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Vượt xa một ứng dụng ghi chép thông thường, chúng tôi đang xây dựng một cỗ máy phân tích dữ liệu y khoa. Kiến trúc được thiết kế theo tiêu chuẩn Mayo Clinic, áp dụng chuẩn FHIR và bảo mật Zero-Trust để chuyển hóa dữ liệu thô thành các quyết định y khoa có tính dự báo (Predictive Care).</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                <div class="bg-white rounded-xl shadow-md p-8 border-t-4 border-blue-500">
+                    <div class="text-5xl font-black text-blue-600 mb-2">10M+</div>
+                    <div class="text-gray-500 font-semibold uppercase tracking-wide text-sm">Điểm Dữ Liệu Mỗi Ngày</div>
+                    <p class="text-sm text-gray-400 mt-3">Xử lý khối lượng lớn telemetry từ ứng dụng và thiết bị đeo (wearables) của hàng triệu người dùng trung niên.</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-8 border-t-4 border-vibrant-orange">
+                    <div class="text-5xl font-black text-vibrant-orange mb-2">&lt;50ms</div>
+                    <div class="text-gray-500 font-semibold uppercase tracking-wide text-sm">Độ Trễ Phân Tích (Latency)</div>
+                    <p class="text-sm text-gray-400 mt-3">Stream Processing đảm bảo các cảnh báo đường huyết nguy hiểm được kích hoạt và gửi đi gần như tức thời.</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-8 border-t-4 border-green-500">
+                    <div class="text-5xl font-black text-green-500 mb-2">100%</div>
+                    <div class="text-gray-500 font-semibold uppercase tracking-wide text-sm">Chuẩn Hóa FHIR & HIPAA</div>
+                    <p class="text-sm text-gray-400 mt-3">Dữ liệu sẵn sàng tương tác với hệ thống EMR của bệnh viện, tuân thủ tuyệt đối về ẩn danh hóa và bảo vệ quyền riêng tư.</p>
+                </div>
+            </div>
+        </section>
+
+        <hr class="border-gray-200 mb-16">
+
+        <section id="nguon-du-lieu" class="mb-16">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 border-l-4 border-vibrant-blue pl-4">Đa Dạng Hóa Nguồn Thu Thập Dữ Liệu</h2>
+                <p class="mt-4 text-gray-600">Với tệp người dùng trung niên, việc nhập liệu thủ công là một rào cản lớn. Hạ tầng Ingestion của chúng tôi được thiết kế để tự động hóa việc thu thập dữ liệu thông qua nhiều giao thức khác nhau, từ API đồng bộ Apple Health/Google Fit đến kết nối Bluetooth trực tiếp với máy đo đường huyết liên tục (CGM).</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Tỷ Trọng Nguồn Dữ Liệu Đầu Vào (Dự Kiến)</h3>
+                    <p class="text-gray-600 mb-6 text-sm">Biểu đồ thể hiện sự dịch chuyển từ việc người dùng tự báo cáo sang thu thập dữ liệu thụ động qua thiết bị. Dữ liệu CGM và Wearables chiếm tỷ trọng lớn nhất, tạo ra luồng dữ liệu thời gian thực (streaming) khổng lồ đòi hỏi Pub/Sub Broker mạnh mẽ.</p>
+                    <ul class="space-y-3">
+                        <li class="flex items-center"><span class="w-3 h-3 rounded-full bg-blue-600 mr-3"></span><strong>Thiết bị CGM & Đo huyết áp (45%):</strong> Dữ liệu liên tục, độ chính xác y khoa.</li>
+                        <li class="flex items-center"><span class="w-3 h-3 rounded-full bg-blue-400 mr-3"></span><strong>Apple Health / Google Fit (30%):</strong> Số bước chân, nhịp tim, giấc ngủ.</li>
+                        <li class="flex items-center"><span class="w-3 h-3 rounded-full bg-vibrant-orange mr-3"></span><strong>Mobile App (Nhập thủ công) (25%):</strong> Bữa ăn, cảm xúc, ghi chú thuốc.</li>
+                    </ul>
+                </div>
+                <div class="chart-container">
+                    <canvas id="dataSourceChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="kien-truc" class="mb-16">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 border-l-4 border-vibrant-blue pl-4">Kiến Trúc Pipeline 5 Lớp (Microservices & Event-Driven)</h2>
+                <p class="mt-4 text-gray-600">Để đảm bảo tính bảo mật "Zero-Trust" và khả năng mở rộng không ma sát (Frictionless Scalability), hệ thống không sử dụng các khối Monolithic. Thay vào đó, dữ liệu chảy qua 5 lớp rạch ròi. Thông tin định danh (PII) bị tách biệt hoàn toàn khỏi dữ liệu sức khỏe trước khi đưa vào kho phân tích (Data Lake).</p>
+            </div>
+
+            <div class="bg-gray-50 p-6 md:p-10 rounded-2xl border border-gray-200">
+                <div class="flex flex-col items-center max-w-4xl mx-auto space-y-2">
+                    
+                    <div class="w-full">
+                        <div class="text-xs font-bold text-gray-500 uppercase mb-2 tracking-widest text-center">Lớp 1: Data Sources</div>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="bg-white border-2 border-green-200 rounded-lg p-4 text-center shadow-sm font-semibold text-green-800">iOS / Android App</div>
+                            <div class="bg-white border-2 border-green-200 rounded-lg p-4 text-center shadow-sm font-semibold text-green-800">CGM / Wearables</div>
+                            <div class="bg-white border-2 border-green-200 rounded-lg p-4 text-center shadow-sm font-semibold text-green-800">HealthKit / Fit API</div>
+                        </div>
+                    </div>
+
+                    <div class="arrow-down">&#8595;</div>
+
+                    <div class="w-full">
+                        <div class="text-xs font-bold text-gray-500 uppercase mb-2 tracking-widest text-center">Lớp 2: Ingestion & API Layer (Compliance Boundary)</div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-yellow-50 p-4 rounded-xl border border-yellow-200">
+                            <div class="arch-card border-yellow-400">
+                                <div class="font-bold text-yellow-800">API Gateway & Auth</div>
+                                <div class="text-xs text-gray-500 mt-1">Load Balancer, OAuth2/OIDC</div>
+                            </div>
+                            <div class="arch-card border-yellow-400">
+                                <div class="font-bold text-yellow-800">Message Broker</div>
+                                <div class="text-xs text-gray-500 mt-1">Kafka / Cloud Pub/Sub</div>
+                            </div>
+                            <div class="arch-card border-yellow-400">
+                                <div class="font-bold text-yellow-800">Healthcare API</div>
+                                <div class="text-xs text-gray-500 mt-1">Ép kiểu định dạng FHIR</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="arrow-down">&#8595;</div>
+
+                    <div class="w-full">
+                        <div class="text-xs font-bold text-gray-500 uppercase mb-2 tracking-widest text-center">Lớp 3: Data Processing</div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="arch-card border-blue-400 bg-blue-50">
+                                <div class="font-bold text-blue-800">Real-time Stream Processing</div>
+                                <div class="text-xs text-gray-600 mt-1">Kiểm tra quy luật, kích hoạt Alert tức thì. Chuyển dữ liệu nóng vào Ops DB.</div>
+                            </div>
+                            <div class="arch-card border-blue-400 bg-blue-50">
+                                <div class="font-bold text-blue-800">Batch ETL & Anonymization</div>
+                                <div class="text-xs text-gray-600 mt-1">Làm sạch, định dạng, và xóa/băm thông tin cá nhân (PII) trước khi lưu trữ sâu.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="arrow-down">&#8595;</div>
+
+                    <div class="w-full">
+                        <div class="text-xs font-bold text-gray-500 uppercase mb-2 tracking-widest text-center">Lớp 4: Secure Storage Layer</div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="arch-card border-red-400 bg-red-50">
+                                <div class="font-bold text-red-800">Operational DB</div>
+                                <div class="text-xs text-gray-600 mt-1">PostgreSQL. Truy vấn cực nhanh cho Mobile App.</div>
+                            </div>
+                            <div class="arch-card border-red-400 bg-red-50">
+                                <div class="font-bold text-red-800">FHIR Data Store</div>
+                                <div class="text-xs text-gray-600 mt-1">Lưu trữ hồ sơ bệnh án tiêu chuẩn lâm sàng.</div>
+                            </div>
+                            <div class="arch-card border-red-400 bg-red-50">
+                                <div class="font-bold text-red-800">Data Warehouse</div>
+                                <div class="text-xs text-gray-600 mt-1">BigQuery. Hồ chứa dữ liệu ẩn danh cho AI.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="arrow-down">&#8595;</div>
+
+                    <div class="w-full">
+                        <div class="text-xs font-bold text-gray-500 uppercase mb-2 tracking-widest text-center">Lớp 5: Serving & Analytics</div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="arch-card border-gray-400 bg-white">
+                                <div class="font-bold text-gray-800 text-center">ML Engine (Predictive Care)</div>
+                            </div>
+                            <div class="arch-card border-gray-400 bg-white">
+                                <div class="font-bold text-gray-800 text-center">Push Notification Service</div>
+                            </div>
+                            <div class="arch-card border-gray-400 bg-white">
+                                <div class="font-bold text-gray-800 text-center">Clinical Dashboard (BI)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section id="hieu-suat" class="mb-16">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 border-l-4 border-vibrant-blue pl-4">Khả Năng Xử Lý Đồng Thời & Mở Rộng</h2>
+                <p class="mt-4 text-gray-600">Sự khác biệt giữa hệ thống thông thường và kiến trúc Y tế nằm ở việc tách bạch (decoupling) luồng dữ liệu. Biểu đồ dưới đây mô phỏng khối lượng dữ liệu được xử lý trong một ngày. Dữ liệu Streaming (nhịp tim, cảnh báo đường huyết) được xử lý liên tục với độ trễ thấp, trong khi các tác vụ nặng (tổng hợp báo cáo, huấn luyện AI) được đẩy vào Batch Processing chạy vào giờ thấp điểm.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 class="text-lg font-semibold text-center mb-4">Lưu Lượng Dữ Liệu: Real-time Streaming vs Batch Processing (Records/Giây)</h3>
+                <div class="chart-container w-full h-[45vh]">
+                    <canvas id="processingVolumeChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="ai-predictive" class="mb-16">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 border-l-4 border-vibrant-blue pl-4">Từ Ghi Chép Đến Dự Báo (Predictive Analytics)</h2>
+                <p class="mt-4 text-gray-600">Mục tiêu tối thượng của Data Warehouse và ML Engine là chuyển từ việc <em>"Báo cáo cái gì đã xảy ra"</em> sang <em>"Dự báo cái gì sắp xảy ra"</em>. Bằng cách kết hợp đa chiều các chỉ số (Tuổi, BMI, Biến thiên đường huyết trung bình), hệ thống có khả năng phân lớp và nhận diện sớm các cụm rủi ro biến chứng ở bệnh nhân.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row items-center gap-8">
+                <div class="w-full md:w-1/3">
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Phân Cụm Nguy Cơ Bằng AI</h3>
+                    <p class="text-sm text-gray-600 mb-4">Biểu đồ phân tán 3D (được render bằng WebGL) minh họa mô hình học máy phân tích tương quan giữa Tuổi tác, Chỉ số khối cơ thể (BMI) và Mức đường huyết. Bệnh nhân lọt vào khu vực màu đỏ sẽ lập tức kích hoạt luồng <strong>Proactive Alerts</strong> đến bác sĩ điều trị và người thân thông qua Notification Service.</p>
+                    <div class="p-4 bg-red-50 border-l-4 border-red-500 rounded text-sm text-red-800">
+                        <strong>Hành động kích hoạt:</strong> Gửi thông báo khuyên bệnh nhân kiểm tra lại khẩu phần ăn và đo đường huyết ngay lập tức trước khi rơi vào trạng thái nguy hiểm.
+                    </div>
+                </div>
+                <div class="w-full md:w-2/3 h-[500px] relative z-10" id="plotly3dContainer">
+                    <!-- Plotly WebGL Chart will inject here. NO SVG. -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-900 text-gray-400 py-8 text-center text-sm">
+        <p class="mb-2">Kiến trúc hạ tầng tuân thủ các nguyên tắc bảo vệ dữ liệu HIPAA (Quốc tế) và Nghị định 13/2023/NĐ-CP (Việt Nam).</p>
+        <p>&copy; 2026 Clinical Data Infrastructure. Single-Page Application Prototype.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            Chart.defaults.maintainAspectRatio = false;
+            Chart.defaults.responsive = true;
+            Chart.defaults.font.family = "'Inter', sans-serif";
+
+            function wrapLabel(label) {
+                if (label.length <= 16) return label;
+                const words = label.split(' ');
+                const lines = [];
+                let currentLine = '';
+                for (const word of words) {
+                    if ((currentLine + word).length > 16) {
+                        if (currentLine) lines.push(currentLine.trim());
+                        currentLine = word + ' ';
+                    } else {
+                        currentLine += word + ' ';
+                    }
+                }
+                if (currentLine) lines.push(currentLine.trim());
+                return lines;
+            }
+
+            const standardTooltipConfig = {
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    titleFont: { size: 14, family: "'Inter', sans-serif" },
+                    bodyFont: { size: 13, family: "'Inter', sans-serif" },
+                    padding: 12,
+                    cornerRadius: 8,
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            const item = tooltipItems[0];
+                            let label = item.chart.data.labels[item.dataIndex];
+                            if (Array.isArray(label)) {
+                                return label.join(' ');
+                            } else {
+                                return label;
+                            }
+                        }
+                    }
+                }
+            };
+
+            const rawSourceLabels = [
+                "Thiết Bị Cảm Biến CGM & Huyết Áp", 
+                "Apple Health & Google Fit APIs", 
+                "Ứng Dụng Di Động (Nhập Thủ Công)"
+            ];
+            const processedSourceLabels = rawSourceLabels.map(wrapLabel);
+
+            const ctxDonut = document.getElementById('dataSourceChart').getContext('2d');
+            new Chart(ctxDonut, {
+                type: 'doughnut',
+                data: {
+                    labels: processedSourceLabels,
+                    datasets: [{
+                        data: [45, 30, 25],
+                        backgroundColor: ['#1E3A8A', '#3B82F6', '#F59E0B'],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    cutout: '65%',
+                    plugins: {
+                        legend: { position: 'bottom', labels: { padding: 20, font: { size: 13 } } },
+                        ...standardTooltipConfig
+                    }
+                }
+            });
+
+            const timeLabels = ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00', '23:59'];
+            const streamData = [1200, 800, 3500, 8500, 9200, 7800, 8900, 6000, 2000];
+            const batchData = [50000, 45000, 5000, 1000, 500, 800, 1500, 5000, 48000];
+
+            const ctxArea = document.getElementById('processingVolumeChart').getContext('2d');
+            new Chart(ctxArea, {
+                type: 'line',
+                data: {
+                    labels: timeLabels,
+                    datasets: [
+                        {
+                            label: 'Real-time Streaming (Pub/Sub)',
+                            data: streamData,
+                            borderColor: '#F59E0B',
+                            backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Batch ETL Jobs (Data Warehouse)',
+                            data: batchData,
+                            borderColor: '#3B82F6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#E2E8F0', drawBorder: false } },
+                        x: { grid: { display: false, drawBorder: false } }
+                    },
+                    plugins: {
+                        legend: { position: 'top' },
+                        ...standardTooltipConfig
+                    }
+                }
+            });
+
+            const n = 200;
+            const age = Array.from({length: n}, () => Math.floor(Math.random() * (75 - 40 + 1) + 40));
+            const bmi = Array.from({length: n}, () => (Math.random() * (40 - 20) + 20).toFixed(1));
+            const glucose = age.map((a, i) => {
+                let base = 90 + (a - 40) * 0.5 + (bmi[i] - 25) * 2;
+                return base + (Math.random() * 30 - 15);
+            });
+            
+            const riskColors = glucose.map(g => {
+                if (g < 110) return '#10B981'; 
+                if (g < 140) return '#F59E0B'; 
+                return '#EF4444'; 
+            });
+
+            const trace = {
+                x: age, y: bmi, z: glucose,
+                mode: 'markers',
+                marker: {
+                    size: 6,
+                    color: riskColors,
+                    opacity: 0.8,
+                    line: { width: 0.5, color: '#ffffff' }
+                },
+                type: 'scatter3d',
+                name: 'Bệnh nhân',
+                hovertemplate: 'Tuổi: %{x}<br>BMI: %{y}<br>Đường Huyết: %{z:.1f} mg/dL<extra></extra>'
+            };
+
+            const layout = {
+                margin: { l: 0, r: 0, b: 0, t: 0 },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                scene: {
+                    xaxis: { title: 'Tuổi (Năm)', backgroundcolor: "#F8FAFC", gridcolor: "#E2E8F0", showbackground: true, zerolinecolor: "#CBD5E1" },
+                    yaxis: { title: 'BMI', backgroundcolor: "#F8FAFC", gridcolor: "#E2E8F0", showbackground: true, zerolinecolor: "#CBD5E1" },
+                    zaxis: { title: 'Đường Huyết (mg/dL)', backgroundcolor: "#F8FAFC", gridcolor: "#E2E8F0", showbackground: true, zerolinecolor: "#CBD5E1" },
+                    camera: { eye: { x: 1.5, y: 1.5, z: 0.5 } }
+                }
+            };
+
+            const config = {
+                responsive: true,
+                displayModeBar: false,
+                renderer: 'webgl' 
+            };
+
+            Plotly.newPlot('plotly3dContainer', [trace], layout, config);
+        });
+    </script>
+</body>
+</html>
